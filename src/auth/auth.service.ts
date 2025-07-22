@@ -32,7 +32,7 @@ export class AuthService {
     pass: string,
   ): Promise<{ access_token: string }> {
     const existingUser = await this.usersService.user({ email: username });
-    if (existingUser) {
+    if (existingUser === null) {
       throw new UnauthorizedException("User with this email already exists");
     }
 

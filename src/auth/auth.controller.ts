@@ -12,6 +12,7 @@ import {
 import { AuthGuard } from "./auth.guard";
 import { AuthService } from "./auth.service";
 import { AuthDto } from "./dto/auth.dto";
+import { CustomRequest } from "./dto/request.dto";
 
 @Controller("auth")
 export class AuthController {
@@ -31,7 +32,7 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Get("me")
-  getProfile(@Request() request) {
+  getProfile(@Request() request: CustomRequest) {
     return request.user;
   }
 }
