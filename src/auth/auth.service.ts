@@ -1,7 +1,15 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import * as bcrypt from "bcrypt";
+
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 
 import { UsersService } from "../users/users.service";
+import { bcryptConstants } from "./constants";
 
 @Injectable()
 export class AuthService {
@@ -11,16 +19,22 @@ export class AuthService {
   ) {}
 
   async signIn(
-    username: string,
-    pass: string,
+    email: string,
+    password: string,
   ): Promise<{ access_token: string }> {
-    const user = await this.usersService.user({ email: username });
+    const user = await this.usersService.find({ email });
 
-    if (user?.password !== pass) {
-      throw new UnauthorizedException();
+    if (user === null) {
+      throw new NotFoundException();
     }
 
-    const payload = { sub: user.id, username: user.email };
+    const result = await bcrypt.compare(password, user.hashedPassword);
+
+    if (!result) {
+      throw new UnauthorizedException("Wrong password");
+    }
+
+    const payload = { email: user.email };
 
     return {
       access_token: await this.jwtService.signAsync(payload),
@@ -28,20 +42,22 @@ export class AuthService {
   }
 
   async register(
-    username: string,
-    pass: string,
+    email: string,
+    password: string,
   ): Promise<{ access_token: string }> {
-    const existingUser = await this.usersService.user({ email: username });
-    if (existingUser === null) {
-      throw new UnauthorizedException("User with this email already exists");
+    const existingUser = await this.usersService.find({ email });
+    if (existingUser !== null) {
+      throw new ConflictException("User with this email already exists");
     }
 
+    const hashedPassword = await bcrypt.hash(password, bcryptConstants.rounds);
+
     const user = await this.usersService.create({
-      email: username,
-      password: pass,
+      email,
+      hashedPassword,
     });
 
-    const payload = { sub: user.id, username: user.email };
+    const payload = { email: user.email };
     return {
       access_token: await this.jwtService.signAsync(payload),
     };

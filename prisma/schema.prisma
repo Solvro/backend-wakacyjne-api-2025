@@ -14,7 +14,16 @@ datasource db {
 }
 
 model User {
-  id    Int     @default(autoincrement()) @id
-  email String  @unique
-  password String
+  id             Int    @id @default(autoincrement())
+  email          String @unique
+  hashedPassword String
+  Task           Task[]
+}
+
+model Task {
+  id         Int     @id @default(autoincrement())
+  content    String
+  done       Boolean @default(false)
+  owner      User    @relation(fields: [ownerEmail], references: [email], onDelete: Cascade, onUpdate: Cascade)
+  ownerEmail String
 }

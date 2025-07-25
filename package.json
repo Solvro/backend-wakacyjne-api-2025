@@ -52,8 +52,14 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.2.0",
     "@prisma/client": "^6.12.0",
+    "@types/bcrypt": "^6.0.0",
+    "@types/express": "^5.0.3",
+    "bcrypt": "^6.0.0",
+    "express": "^5.1.0",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "uuid": "^11.1.0",
+    "zod": "^4.0.9"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
@@ -65,8 +71,8 @@
     "@solvro/config": "^2.0.0",
     "@swc/cli": "^0.6.0",
     "@swc/core": "^1.10.7",
-    "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
+    "@types/multer": "^2.0.0",
     "@types/node": "^22.10.7",
     "@types/supertest": "^6.0.2",
     "eslint": "^9.18.0",
