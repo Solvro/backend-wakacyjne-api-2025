@@ -21,8 +21,10 @@ import {
 
 import { AuthGuard } from "./auth.guard";
 import { AuthService } from "./auth.service";
+import { AccessTokenDTO } from "./dto/access-token.dto";
 import { AuthDto, authSchema } from "./dto/auth.dto";
 import { MeDTO } from "./dto/me.dto";
+import { RefreshTokenDTO } from "./dto/refresh-token.dto";
 import { CustomRequest } from "./dto/request.dto";
 
 @ApiTags()
@@ -132,5 +134,19 @@ export class AuthController {
   })
   getProfile(@Request() request: CustomRequest) {
     return request.user;
+  }
+
+  @Post("refresh")
+  @ApiOperation({
+    summary: "Get refresh token",
+    description: "Returns a refresh token for a logged user",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Successfully refreshed token",
+    type: AccessTokenDTO,
+  })
+  async getRefreshToken(@Body() refreshTokenDTO: RefreshTokenDTO) {
+    return this.authService.refreshAccessToken(refreshTokenDTO.refreshToken);
   }
 }

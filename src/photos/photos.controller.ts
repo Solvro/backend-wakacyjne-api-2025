@@ -56,6 +56,16 @@ export class PhotosController {
     return this.photosService.uploadPhoto(file);
   }
 
+  @Get()
+  @ApiOperation({
+    summary: "Gets all uploaded photos",
+    description: "Returns a list of all photos that were uploaded",
+  })
+  @ApiResponse({ status: 200, type: Array<string> })
+  getAllUploadedPhotos(): string[] {
+    return this.photosService.getAllUploadedPhotos();
+  }
+
   @Get(":filename")
   @ApiOkResponse()
   @ApiOperation({ summary: "Download a photo" })

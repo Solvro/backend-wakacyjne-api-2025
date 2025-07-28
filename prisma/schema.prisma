@@ -14,16 +14,18 @@ datasource db {
 }
 
 model User {
-  id             Int    @id @default(autoincrement())
-  email          String @unique
+  id             Int     @id @default(autoincrement())
+  email          String  @unique
   hashedPassword String
-  Task           Task[]
+  refreshToken   String? @unique
+  Place          Place[]
 }
 
-model Task {
-  id         Int     @id @default(autoincrement())
-  content    String
-  done       Boolean @default(false)
-  owner      User    @relation(fields: [ownerEmail], references: [email], onDelete: Cascade, onUpdate: Cascade)
-  ownerEmail String
+model Place {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+  imageUrl    String?
+  owner       User    @relation(fields: [ownerEmail], references: [email], onDelete: Cascade, onUpdate: Cascade)
+  ownerEmail  String
 }

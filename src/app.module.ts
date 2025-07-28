@@ -3,7 +3,7 @@ import { ConfigModule } from "@nestjs/config";
 
 import { AuthModule } from "./auth/auth.module";
 import { PhotosModule } from "./photos/photos.module";
-import { TasksModule } from "./tasks/tasks.module";
+import { PlacesModule } from "./places/places.module";
 import { UsersModule } from "./users/users.module";
 import { validate } from "./validate";
 
@@ -14,8 +14,8 @@ import { validate } from "./validate";
     }),
     AuthModule,
     UsersModule,
-    TasksModule,
     PhotosModule,
+    PlacesModule,
   ],
 })
 export class AppModule {}

@@ -1,0 +1,102 @@
+//ze względu na korzystanie ze swaggera, prismy i zoda:
+//  nie da sie zrobić fajnych połączeń zod - swagger - nest, bo @ApiProperty, a w nestjs-zod createZodDTO czy coś podobnego nie działa
+//  z prismowych typów nie da się zrobić typów z @ApiProperty, więc trzeba z ręki pisać, aby swagger udokumentował
+//najszybciej jak to można robić, to po prostu kopiować typy z prismy z podświetlania i je zamieniać na klasy DTO
+import type { Place as PlaceModel } from "@prisma/client";
+import { z } from "zod";
+
+import { ApiProperty } from "@nestjs/swagger";
+
+export const createPlaceSchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+  imageUrl: z.string().optional(),
+});
+
+export class PlaceCreateWithoutOwnerInputDTO {
+  @ApiProperty({
+    description: "Name of the destination",
+    example: "Santorini Sunset View",
+    required: true,
+  })
+  name: string;
+
+  @ApiProperty({
+    description: "Detailed description",
+    example:
+      "Beautiful sunset views over the caldera with whitewashed buildings",
+  })
+  description: string | null;
+
+  @ApiProperty({
+    description: "URL to an image",
+    example: "https://example.com/santorini-sunset.jpg",
+    format: "uri",
+  })
+  imageUrl: string | null;
+}
+
+export const updatePlaceSchema = z.object({
+  name: z.string().optional(),
+  description: z.string().optional(),
+  imageUrl: z.string().optional(),
+});
+
+export class PlaceUpdateWithoutOwnerInputDTO {
+  @ApiProperty({
+    description: "Updated name of the travel destination",
+    example: "Santorini Caldera Sunset",
+  })
+  name: string | null;
+
+  @ApiProperty({
+    description: "Updated description",
+    example: "Stunning sunset views from Oia village with blue dome churches",
+    nullable: true,
+  })
+  description: string | null;
+
+  @ApiProperty({
+    description: "Updated image URL for the destination",
+    example: "https://example.com/santorini-caldera.jpg",
+    format: "uri",
+    nullable: true,
+  })
+  imageUrl: string | null;
+}
+
+export class PlaceResponseDTO implements Partial<PlaceModel> {
+  @ApiProperty({
+    description: "Unique identifier of the travel place",
+    example: 1,
+  })
+  id: number;
+
+  @ApiProperty({
+    description: "Name of the travel destination",
+    example: "Santorini Sunset View",
+  })
+  name: string;
+
+  @ApiProperty({
+    description: "Detailed description",
+    example:
+      "Beautiful sunset views over the caldera with whitewashed buildings",
+    nullable: true,
+  })
+  description: string | null;
+
+  @ApiProperty({
+    description: "Image URL for the destination",
+    example: "https://example.com/santorini-sunset.jpg",
+    format: "uri",
+    nullable: true,
+  })
+  imageUrl: string | null;
+
+  @ApiProperty({
+    description: "Email of the user",
+    example: "traveler@example.com",
+  })
+  ownerEmail: string;
+}

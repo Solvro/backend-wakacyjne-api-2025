@@ -2,6 +2,7 @@ import {
   createReadStream,
   existsSync,
   mkdirSync,
+  readdirSync,
   unlinkSync,
   writeFileSync,
 } from "node:fs";
@@ -97,6 +98,27 @@ export class PhotosService {
     } catch {
       throw new InternalServerErrorException("Failed to save the photo");
     }
+  }
+
+  getAllUploadedPhotos(): string[] {
+    const filesDirectory = this.config.uploadDirectory;
+
+    return readdirSync(filesDirectory, "utf8");
+  }
+
+  existsPhoto(filename: string): boolean {
+    let filePath = "";
+    try {
+      filePath = path.join(this.config.uploadDirectory, filename);
+    } catch {
+      throw new NotFoundException("Photo not found");
+    }
+
+    if (!existsSync(filePath)) {
+      throw new NotFoundException("Photo not found");
+    }
+
+    return true;
   }
 
   getPhotoStream(filename: string): {
