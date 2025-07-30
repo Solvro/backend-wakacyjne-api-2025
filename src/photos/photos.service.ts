@@ -111,11 +111,11 @@ export class PhotosService {
     try {
       filePath = path.join(this.config.uploadDirectory, filename);
     } catch {
-      throw new NotFoundException("Photo not found");
+      return false;
     }
 
     if (!existsSync(filePath)) {
-      throw new NotFoundException("Photo not found");
+      return false;
     }
 
     return true;

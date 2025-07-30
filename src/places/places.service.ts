@@ -3,19 +3,27 @@ import { PrismaService } from "src/prisma/prisma.service";
 
 import { Injectable } from "@nestjs/common";
 
+import { nullToUndefined } from "./utils/null-to-undefined";
+
 @Injectable()
 export class PlacesService {
   constructor(private prisma: PrismaService) {}
 
   async create(
     userEmail: string,
-    { name, description, imageUrl }: Prisma.PlaceCreateWithoutOwnerInput,
+    {
+      name,
+      description,
+      imageUrl,
+      isFavourite,
+    }: Prisma.PlaceCreateWithoutOwnerInput,
   ) {
-    return this.prisma.place.create({
+    const result = await this.prisma.place.create({
       data: {
         name,
         description,
         imageUrl,
+        isFavourite,
         owner: {
           connect: {
             email: userEmail,
@@ -23,10 +31,12 @@ export class PlacesService {
         },
       },
     });
+
+    return nullToUndefined(result);
   }
 
   async findAll() {
-    return this.prisma.place.findMany();
+    return nullToUndefined(await this.prisma.place.findMany());
   }
 
   async findMany(parameters: {
@@ -37,31 +47,33 @@ export class PlacesService {
     orderBy?: Prisma.PlaceOrderByWithRelationInput;
   }) {
     const { skip, take, cursor, where, orderBy } = parameters;
-    return this.prisma.place.findMany({
+    const result = await this.prisma.place.findMany({
       skip,
       take,
       cursor,
       where,
       orderBy,
     });
+
+    return nullToUndefined(result);
   }
 
   async findOne(where: Prisma.PlaceWhereUniqueInput) {
-    return this.prisma.place.findUnique({ where });
+    return nullToUndefined(await this.prisma.place.findUnique({ where }));
   }
 
   async update(
     where: Prisma.PlaceWhereUniqueInput,
     data: Prisma.PlaceUpdateWithoutOwnerInput,
   ) {
-    return this.prisma.place.update({ where, data });
+    return nullToUndefined(await this.prisma.place.update({ where, data }));
   }
 
   async remove(where: Prisma.PlaceWhereUniqueInput) {
-    return this.prisma.place.delete({ where });
+    return nullToUndefined(await this.prisma.place.delete({ where }));
   }
 
   async count(where: Prisma.PlaceWhereInput) {
-    return this.prisma.place.count({ where });
+    return nullToUndefined(await this.prisma.place.count({ where }));
   }
 }

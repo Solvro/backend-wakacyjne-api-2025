@@ -5,12 +5,13 @@
 import type { Place as PlaceModel } from "@prisma/client";
 import { z } from "zod";
 
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
 export const createPlaceSchema = z.object({
   name: z.string(),
   description: z.string().optional(),
   imageUrl: z.string().optional(),
+  isFavourite: z.boolean().optional(),
 });
 
 export class PlaceCreateWithoutOwnerInputDTO {
@@ -21,48 +22,59 @@ export class PlaceCreateWithoutOwnerInputDTO {
   })
   name: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: "Detailed description",
     example:
       "Beautiful sunset views over the caldera with whitewashed buildings",
   })
-  description: string | null;
+  description?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: "URL to an image",
     example: "https://example.com/santorini-sunset.jpg",
     format: "uri",
   })
-  imageUrl: string | null;
+  imageUrl?: string;
+
+  @ApiPropertyOptional({
+    description: "Marks place as favourite",
+    example: "true",
+  })
+  isFavourite?: boolean;
 }
 
 export const updatePlaceSchema = z.object({
   name: z.string().optional(),
   description: z.string().optional(),
   imageUrl: z.string().optional(),
+  isFavourite: z.boolean().optional(),
 });
 
 export class PlaceUpdateWithoutOwnerInputDTO {
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: "Updated name of the travel destination",
     example: "Santorini Caldera Sunset",
   })
-  name: string | null;
+  name?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: "Updated description",
     example: "Stunning sunset views from Oia village with blue dome churches",
-    nullable: true,
   })
-  description: string | null;
+  description?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: "Updated image URL for the destination",
     example: "https://example.com/santorini-caldera.jpg",
     format: "uri",
-    nullable: true,
   })
-  imageUrl: string | null;
+  imageUrl?: string;
+
+  @ApiPropertyOptional({
+    description: "Marks place as favourite",
+    example: "true",
+  })
+  isFavourite?: boolean;
 }
 
 export class PlaceResponseDTO implements Partial<PlaceModel> {
@@ -78,21 +90,25 @@ export class PlaceResponseDTO implements Partial<PlaceModel> {
   })
   name: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: "Detailed description",
     example:
       "Beautiful sunset views over the caldera with whitewashed buildings",
-    nullable: true,
   })
-  description: string | null;
+  description?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: "Image URL for the destination",
     example: "https://example.com/santorini-sunset.jpg",
     format: "uri",
-    nullable: true,
   })
-  imageUrl: string | null;
+  imageUrl?: string;
+
+  @ApiPropertyOptional({
+    description: "Marks place as favourite",
+    example: "true",
+  })
+  isFavourite?: boolean;
 
   @ApiProperty({
     description: "Email of the user",

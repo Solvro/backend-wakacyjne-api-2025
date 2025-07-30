@@ -26,6 +26,7 @@ model Place {
   name        String
   description String?
   imageUrl    String?
+  isFavourite Boolean?
   owner       User    @relation(fields: [ownerEmail], references: [email], onDelete: Cascade, onUpdate: Cascade)
   ownerEmail  String
 }

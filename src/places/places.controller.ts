@@ -39,6 +39,7 @@ import {
   updatePlaceSchema,
 } from "./dto/places.dto";
 import { PlacesService } from "./places.service";
+import { undefinedToNull } from "./utils/undefined-to-null";
 
 @ApiTags("places")
 @UseGuards(AuthGuard)
@@ -76,7 +77,7 @@ export class PlacesController {
     @Body() data: PlaceCreateWithoutOwnerInputDTO,
   ): Promise<PlaceResponseDTO> {
     if (
-      data.imageUrl !== null &&
+      data.imageUrl !== undefined &&
       !this.photosService.existsPhoto(data.imageUrl)
     ) {
       throw new NotFoundException("Photo not found in uploaded photos");
@@ -99,13 +100,14 @@ export class PlacesController {
     @Query("sort") sort: "asc" | "desc" = "asc",
     @Query() query: Record<string, unknown>,
     @Query("sortBy") sortBy?: [keyof Place],
-  ): Promise<PaginatedDTO<Place>> {
+  ): Promise<PaginatedDTO<PlaceResponseDTO>> {
     const validPlaceProperties = new Set<keyof Place>([
       "name",
       "description",
       "id",
       "ownerEmail",
       "imageUrl",
+      "isFavourite",
     ]);
 
     let orderBy: Record<string, "asc" | "desc"> | undefined;
@@ -122,7 +124,13 @@ export class PlacesController {
 
     for (const [key, value] of Object.entries(query)) {
       if (validPlaceProperties.has(key as keyof Place)) {
-        where[key] = key === "id" ? Number(value) : value;
+        if (key === "id") {
+          where[key] = Number(value);
+        } else if (key === "isFavourite") {
+          where[key] = value === "true";
+        } else {
+          where[key] = value;
+        }
       }
     }
 
@@ -169,7 +177,7 @@ export class PlacesController {
   ): Promise<PlaceResponseDTO> {
     const place = await this.placesService.findOne({ id });
 
-    if (place === null) {
+    if (place === undefined) {
       throw new NotFoundException("Place not found");
     }
 
@@ -178,6 +186,7 @@ export class PlacesController {
         "You can only access your own travel places",
       );
     }
+
     return place;
   }
 
@@ -213,7 +222,7 @@ export class PlacesController {
   ): Promise<PlaceResponseDTO> {
     const place = await this.placesService.findOne({ id });
 
-    if (place === null) {
+    if (place === undefined) {
       throw new NotFoundException("Place not found");
     }
 
@@ -224,19 +233,19 @@ export class PlacesController {
     }
 
     if (
-      data.imageUrl !== null &&
+      data.imageUrl !== undefined &&
       !this.photosService.existsPhoto(data.imageUrl)
     ) {
       throw new NotFoundException("Photo not found in uploaded photos");
     }
 
+    const transformedData = undefinedToNull(data, {
+      stripOptional: true,
+    });
+
     return this.placesService.update(
       { id },
-      {
-        name: data.name ?? undefined,
-        description: data.description ?? undefined,
-        imageUrl: data.imageUrl ?? undefined,
-      },
+      { ...transformedData, name: data.name },
     );
   }
 
@@ -263,10 +272,10 @@ export class PlacesController {
   async remove(
     @Request() request: CustomRequest,
     @Param("id", ParseIntPipe) id: number,
-  ): Promise<void> {
+  ) {
     const place = await this.placesService.findOne({ id });
 
-    if (place === null) {
+    if (place === undefined) {
       throw new NotFoundException("Place not found");
     }
 
