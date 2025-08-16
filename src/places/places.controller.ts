@@ -88,17 +88,28 @@ export class PlacesController {
 
   @Get()
   @ApiOkResponse({ type: PaginatedDTO<Place> })
-  @ApiOperation({
-    summary: "Get paginated travel places with filtering",
-    description:
-      "Find with pagination, filtering and sorting travel destinations for current logged in user",
-  })
+  @ApiOperation(
+    {
+      summary: "Get paginated travel places with filtering",
+      description:
+        "Find with pagination, filtering and sorting travel destinations for current logged in user",
+      parameters: [
+        {
+          name: "sort",
+          in: "query",
+          allowEmptyValue: true,
+          required: false,
+        },
+      ],
+    },
+    { overrideExisting: true },
+  )
   async findMany(
     @Request() request: CustomRequest,
     @Query("page", new ParseIntPipe({ optional: true })) page = 0,
     @Query("perPage", new ParseIntPipe({ optional: true })) perPage = 10,
-    @Query("sort") sort: "asc" | "desc" = "asc",
     @Query() query: Record<string, unknown>,
+    @Query("sort") sort?: "asc" | "desc",
     @Query("sortBy") sortBy?: [keyof Place],
   ): Promise<PaginatedDTO<PlaceResponseDTO>> {
     const validPlaceProperties = new Set<keyof Place>([
@@ -115,7 +126,7 @@ export class PlacesController {
       sortBy !== undefined &&
       validPlaceProperties.has(sortBy as unknown as keyof Place)
     ) {
-      orderBy = { [sortBy as unknown as string]: sort };
+      orderBy = { [sortBy as unknown as string]: sort ?? "asc" };
     }
 
     const where: Prisma.PlaceWhereInput = {
